@@ -7,13 +7,14 @@ function startScreen() {
 
   ctx.font = "48px Calibri";
   ctx.fillStyle = "white";
-  ctx.fillText("Press SPACE to Begin!", 100, 300);
+  ctx.fillText("Press ENTER to Begin!", 100, 300);
 }
 
 // TEST LOGIC
 function testLogic() {
   movePlayer();
   checkTestOver();
+  shootProjectile();
 }
 
 // GAME LOGIC
@@ -37,11 +38,60 @@ function movePlayer() {
   }
 }
 
+// SHOOTING
+let n = 0;
+function projectilesCheck(e) {
+  if (e.code === "Space") {
+    n++;
+  }
+}
+
+function shootProjectile() {
+  if (projectiles.length < n) {
+    projectiles.push(
+      (projectile = {
+        x: player.x + player.w / 2,
+        y: player.y + 1,
+        w: 5,
+        h: 5,
+        color: "white",
+        speed: 5,
+        hit: false,
+        called: true,
+      })
+    );
+  }
+}
+
+function updateProjectile() {
+  for (let i = 0; i < projectiles.length; i++) {
+    if (
+      !projectiles[i].called ||
+      projectiles[i].x < 0 ||
+      projectiles[i].x + projectiles[i].w > cnv.width ||
+      projectiles[i].y < 0 ||
+      projectiles[i].y + projectiles[i].h > cnv.height
+    ) {
+      projectiles.splice(i, 1);
+    }
+
+    if (ptInRect(projectiles[i].x, projectiles[i].y, player2)) {
+      projectiles[i].hit = true;
+      projectiles[i].color = "#333";
+    } else {
+      projectiles[i].hit = false;
+      projectiles[i].color = "white";
+    }
+  }
+}
+
 // CHECK TEST OVER
 function checkTestOver() {
   // Game over if player touches enemy
-  if (rectCollide(player, player2)) {
-    state = "gameover";
+  for (let i = 0; i < projectiles.length; i++) {
+    if (rectCollide(projectiles[i], player2)) {
+      state = "gameover";
+    }
   }
 }
 
@@ -71,6 +121,19 @@ function testScreen() {
   // Draw player 2 / enemy
   ctx.fillStyle = player2.color;
   ctx.fillRect(player2.x, player2.y, player2.w, player2.h);
+
+  // Draw projectiles
+  for (let i = 0; i < projectiles.length; i++) {
+    if (projectiles[i].called) {
+      ctx.fillStyle = "white";
+      ctx.fillRect(
+        projectiles[i].x,
+        (projectiles[i].y -= projectiles[i].speed),
+        projectiles[i].w,
+        projectiles[i].h
+      );
+    }
+  }
 }
 
 // DRAW GAME SCREEN
@@ -96,7 +159,7 @@ function testOver() {
   ctx.fillText("GAME OVER", 100, 300);
 
   ctx.font = "24px Calibri";
-  ctx.fillText("Press SPACE to return to Start Screen.", 100, 350);
+  ctx.fillText("Press ENTER to return to Start Screen.", 100, 350);
 }
 
 // GAME OVER SCREEN
@@ -111,12 +174,19 @@ function gameOver() {
   ctx.fillText("GAME OVER", 100, 300);
 
   ctx.font = "24px Calibri";
-  ctx.fillText("Press SPACE to return to Start Screen.", 100, 350);
+  ctx.fillText("Press ENTER to return to Start Screen.", 100, 350);
 }
 
 // RESET VARIABLES
 function reset() {
   state = "start";
+
+  for (let i = 0; i < projectiles.length; i++) {
+    projectiles[i].called = false;
+  }
+
+  n = 0;
+
   player = {
     x: 388,
     y: 288,

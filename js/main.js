@@ -17,6 +17,16 @@ let player = {
   speed: 5,
 };
 
+let projectile = {
+  x: player.x,
+  y: player.y,
+  w: 5,
+  h: 5,
+  color: "white",
+  speed: 5,
+  hit: false,
+};
+
 let player2 = {
   x: 388,
   y: 88,
@@ -53,12 +63,15 @@ function draw() {
 // KEYDOWN EVENT
 document.addEventListener("keydown", keydownHandler);
 
+document.addEventListener("keyup", projectilesCheck);
+
 function keydownHandler(e) {
-  if (state === "start" && e.code === "Space") {
+  if (state === "start" && e.code === "Enter") {
     state = "running";
   } else if (state === "start" && e.code === "KeyT") {
+    reset();
     state = "test";
-  } else if (state === "gameover" && e.code === "Space") {
+  } else if (state === "gameover" && e.code === "Enter") {
     reset();
   }
 }

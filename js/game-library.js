@@ -5,6 +5,7 @@ let mouseX;
 let mouseY;
 
 let keyPressed = {};
+let projectiles = [];
 
 // EVENT STUFF
 
